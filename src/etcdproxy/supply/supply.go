@@ -2,6 +2,8 @@ package supply
 
 import (
 	"io"
+	"os"
+	"path/filepath"
 
 	"github.com/cloudfoundry/libbuildpack"
 )
@@ -41,9 +43,41 @@ type Supplier struct {
 }
 
 func (s *Supplier) Run() error {
-	s.Log.BeginStep("Supplying etcdproxy")
+	s.Log.BeginStep("Supplying etcd")
 
-	// TODO: Install any dependencies here...
+	etcd, err := s.Manifest.DefaultVersion("etcd")
+	if err != nil {
+		return err
+	}
+	s.Log.Info("Using etcd version %s", etcd.Version)
+
+	if err := s.Installer.InstallDependency(etcd, s.Stager.DepDir()); err != nil {
+		return err
+	}
+
+	// Find unpacked "etcd-v3.3.13-linux-amd64/etcd" file
+	etcdFile, err := filepath.Glob(filepath.Join(s.Stager.DepDir(), "etcd*linux-amd64", "etcd"))
+	if err != nil {
+		return err
+	}
+
+	// Rename and move into bin/etcd, which will be in $PATH
+	err = os.Rename(etcdFile[0], filepath.Join(s.Stager.DepDir(), "bin", "etcd"))
+	if err != nil {
+		return err
+	}
+
+	// Find unpacked "etcd-v3.3.13-linux-amd64/etcdctl" file
+	etcdctlFile, err := filepath.Glob(filepath.Join(s.Stager.DepDir(), "etcd*linux-amd64", "etcdctl"))
+	if err != nil {
+		return err
+	}
+
+	// Rename and move into bin/etcdctl, which will be in $PATH
+	err = os.Rename(etcdctlFile[0], filepath.Join(s.Stager.DepDir(), "bin", "etcdctl"))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
