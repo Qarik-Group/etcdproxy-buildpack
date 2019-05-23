@@ -12,7 +12,7 @@ meta:
     name:   ((git-commit-name))
 
   github:
-    owner:  drnic
+    owner:  starkandwayne
     repo:   (( grab meta.name ))
     branch: master
     private_key:  ((github-private-key))
