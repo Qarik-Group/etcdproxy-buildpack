@@ -21,7 +21,7 @@ To build this buildpack, run the following command from the buildpack's director
 1. Build the buildpack
 
     ```bash
-    buildpack-packager build
+    buildpack-packager build -stack cflinuxfs3 -cached
     ```
 
 1. Use in Cloud Foundry
@@ -29,8 +29,10 @@ To build this buildpack, run the following command from the buildpack's director
     Upload the buildpack to your Cloud Foundry and optionally specify it by name
 
     ```bash
-    cf create-buildpack [BUILDPACK_NAME] [BUILDPACK_ZIP_FILE_PATH] 1
-    cf push my_app [-b BUILDPACK_NAME]
+    cf create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
+    cf v3-create-app app-using-etcd
+    cf v3-apply-manifest -f fixtures/static/manifest.cfdev.yml
+    cf v3-push app-using-etcd -p fixtures/static
     ```
 
 ### Testing
