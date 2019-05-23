@@ -6,10 +6,10 @@ applications:
   stack: cflinuxfs3
   buildpacks:
   - etcdproxy_buildpack
-  - staticfile_buildpack
-  # sidecars:
-  # - name: etcdproxy
-  #   process_types: [web]
-  #   command: etcd grpc-proxy start --endpoints=host.cfdev.sh:2379 --listen-addr=127.0.0.1:2379
+  - ruby_buildpack
+  sidecars:
+  - name: etcd
+    process_types: [web]
+    command: etcd grpc-proxy start --endpoints=host.cfdev.sh:2379 --listen-addr=127.0.0.1:2379
   routes:
   - route: app-using-etcd.dev.cfdev.sh

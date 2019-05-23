@@ -1,3 +1,23 @@
+# Buildpack to add Etcd proxy as sidecar to Cloud Foundry applications
+
+During deployment staging you will see the latest etcd version being installed into the application droplet:
+
+```plain
+$ cf v3-push
+...
+[STG/0] OUT -----> Etcdproxy Buildpack version 1.0.0
+[STG/0] OUT -----> Supplying etcd
+[STG/0] OUT        Using etcd version 3.3.13
+[STG/0] OUT -----> Installing etcd 3.3.13
+[STG/0] OUT        Copy [/tmp/buildpacks/3d4ba95f26291321f5c6633264c1c6bb/dependencies/02866fcde1388c50c101a96ed2d1cfdb/etcd-v3.3.13-linux-amd64.ta
+```
+
+```plain
+$ cf logs app-with-etcd
+...
+[APP/PROC/WEB/SIDECAR/ETCDPROXY/0] ERR | etcdmain: listening for grpc-proxy client requests on 127.0.0.1:2379
+```
+
 ## Buildpack User Documentation
 
 ### Building the Buildpack
@@ -31,8 +51,8 @@ To build this buildpack, run the following command from the buildpack's director
     ```bash
     cf create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
     cf v3-create-app app-using-etcd
-    cf v3-apply-manifest -f fixtures/static/manifest.cfdev.yml
-    cf v3-push app-using-etcd -p fixtures/static
+    cf v3-apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
+    cf v3-push app-using-etcd -p fixtures/rubyapp
     ```
 
     As buildpack that delivers a sidecar, you'll need an explicit `manifest.yml` that describes the startup of the sidecar. For example, running an app within CFDev, and proxying to an etcd server on your host machine (`host.cfdev.sh:2379`):
@@ -87,7 +107,3 @@ To test this buildpack, run the following command from the buildpack's directory
 ### Reporting Issues
 
 Open an issue on this project
-
-## Disclaimer
-
-This buildpack is experimental and not yet intended for production use.
