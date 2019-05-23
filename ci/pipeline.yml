@@ -62,6 +62,10 @@ jobs:
           - name: pushme
           run:
             path: git/ci/scripts/update-manifest.sh
+      - put: git
+        params:
+          repository: pushme
+          rebase: true
 
 resources:
   - name: git
