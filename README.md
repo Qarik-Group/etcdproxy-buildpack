@@ -90,12 +90,6 @@ To test this buildpack, run the following command from the buildpack's directory
 
     To simplify the process in the future, install [direnv](https://direnv.net/) which will automatically source .envrc when you change directories.
 
-1. Run unit tests
-
-    ```bash
-    ./scripts/unit.sh
-    ```
-
 1. Run integration tests
 
     ```bash
