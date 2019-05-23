@@ -26,13 +26,34 @@ To build this buildpack, run the following command from the buildpack's director
 
 1. Use in Cloud Foundry
 
-    Upload the buildpack to your Cloud Foundry and optionally specify it by name
+    Upload the buildpack to your Cloud Foundry.
 
     ```bash
     cf create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
     cf v3-create-app app-using-etcd
     cf v3-apply-manifest -f fixtures/static/manifest.cfdev.yml
     cf v3-push app-using-etcd -p fixtures/static
+    ```
+
+    As buildpack that delivers a sidecar, you'll need an explicit `manifest.yml` that describes the startup of the sidecar. For example, running an app within CFDev, and proxying to an etcd server on your host machine (`host.cfdev.sh:2379`):
+
+    ```yaml
+    applications:
+    - name: app-using-etcd
+      instances: 1
+      memory: 128M
+      disk_quota: 512M
+      stack: cflinuxfs3
+      buildpacks:
+      - etcdproxy_buildpack
+      - staticfile_buildpack
+      sidecars:
+      - name: etcdproxy
+        process_types:
+        - web
+        command: etcd grpc-proxy start --endpoints=host.cfdev.sh:2379 --listen-addr=127.0.0.1:2379
+      routes:
+      - route: app-using-etcd.dev.cfdev.sh
     ```
 
 ### Testing
