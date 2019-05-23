@@ -11,6 +11,9 @@ import (
 
 var _ = Describe("Rubyapp Integration Test", func() {
 	var app *cutlass.App
+	BeforeEach(func() {
+		Expect(ApiHasSidecar()).To(BeTrue())
+	})
 	AfterEach(func() {
 		if app != nil {
 			app.Destroy()
