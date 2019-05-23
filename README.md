@@ -1,6 +1,33 @@
-# Buildpack to add Etcd proxy as sidecar to Cloud Foundry applications
+# Add etcd proxy as sidecar to Cloud Foundry applications
 
-During deployment staging you will see the latest etcd version being installed into the application droplet:
+You will know that [etcd](https://coreos.com/etcd/) is a distributed, reliable key-value store. This buildpack does not install or run an etcd cluster, instead to runs an etcd proxy as a sidecar next to your application. Your application need only connect to `localhost2379` and get the full benefits of connecting to a secure, highly-available, multi-node etcd cluster.
+
+From [etcd proxy docs](https://coreos.com/etcd/docs/latest/op-guide/grpc_proxy.html):
+
+> The gRPC proxy is a stateless etcd reverse proxy operating at the gRPC layer (L7). The proxy is designed to reduce the total processing load on the core etcd cluster. For horizontal scalability, it coalesces watch and lease API requests. To protect the cluster against abusive clients, it caches key range requests.
+>
+> The gRPC proxy supports multiple etcd server endpoints. When the proxy starts, it randomly picks one etcd server endpoint to use. This endpoint serves all requests until the proxy detects an endpoint failure. If the gRPC proxy detects an endpoint failure, it switches to a different endpoint, if available, to hide failures from its clients. Other retry policies, such as weighted round-robin, may be supported in the future.
+
+The etcd proxy is distributed within the `etcd` binary, which is packaged and installed into your Cloud Foundry application using this supply buildpack.
+
+You configure your Cloud Foundry application to both:
+
+1. Use this supply buildpack, in addition to your application's primary buildpack.
+1. Run `etcd proxy start` as a sidecar within your application containers.
+
+## Example usage
+
+There is a sample application within `fixtures/rubyapp` that can be installed. To use sidecars we need the `cf v3-xyz` commands:
+
+```plain
+cf create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
+cf v3-create-app app-using-etcd
+cf v3-apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
+cf v3-push app-using-etcd -p fixtures/rubyapp
+```
+
+During deployment staging of `cf v3-push` you will see the latest etcd version being installed into the application droplet:
+
 
 ```plain
 $ cf v3-push
@@ -12,11 +39,15 @@ $ cf v3-push
 [STG/0] OUT        Copy [/tmp/buildpacks/3d4ba95f26291321f5c6633264c1c6bb/dependencies/02866fcde1388c50c101a96ed2d1cfdb/etcd-v3.3.13-linux-amd64.ta
 ```
 
+The application container logs will show etcd proxy output with `ETCDPROXY/0` prefix:
+
 ```plain
 $ cf logs app-with-etcd
 ...
 [APP/PROC/WEB/SIDECAR/ETCDPROXY/0] ERR | etcdmain: listening for grpc-proxy client requests on 127.0.0.1:2379
 ```
+
+Your application only needs to connect to `localhost:2379` or `127.0.0.1:2379` without any other configuration requirements.
 
 ## Buildpack User Documentation
 
