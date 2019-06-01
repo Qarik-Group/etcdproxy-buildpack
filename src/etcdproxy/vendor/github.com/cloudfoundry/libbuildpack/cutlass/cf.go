@@ -359,38 +359,6 @@ func (a *App) PushNoStart() error {
 	return nil
 }
 
-func (a *App) V3PushNoStart() error {
-	args := []string{"v3-push", a.Name, "--no-start", "-p", a.Path}
-
-	command := exec.Command("cf", args...)
-	command.Stdout = DefaultStdoutStderr
-	command.Stderr = DefaultStdoutStderr
-	if err := command.Run(); err != nil {
-		return err
-	}
-
-	for k, v := range a.env {
-		command := exec.Command("cf", "v3-set-env", a.Name, k, v)
-		command.Stdout = DefaultStdoutStderr
-		command.Stderr = DefaultStdoutStderr
-		if err := command.Run(); err != nil {
-			return err
-		}
-	}
-
-	if a.logCmd == nil {
-		a.logCmd = exec.Command("cf", "logs", a.Name)
-		a.logCmd.Stderr = DefaultStdoutStderr
-		a.Stdout = &Buffer{}
-		a.logCmd.Stdout = a.Stdout
-		if err := a.logCmd.Start(); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (a *App) V3CreateApp() error {
 	args := []string{"v3-create-app", a.Name}
 	command := exec.Command("cf", args...)
@@ -418,7 +386,7 @@ func (a *App) V3ApplyManifest() error {
 
 	tmpManifestFile, err := ioutil.TempFile(os.TempDir(), "manifest-*.yml")
 	if err != nil {
-		return nil
+		return err
 	}
 	defer os.Remove(tmpManifestFile.Name())
 
@@ -437,17 +405,35 @@ func (a *App) V3ApplyManifest() error {
 	return nil
 }
 
+// V3Push assumes V3CreateApp has already been run
 func (a *App) V3Push() error {
-	if err := a.V3PushNoStart(); err != nil {
-		return err
+	for k, v := range a.env {
+		command := exec.Command("cf", "v3-set-env", a.Name, k, v)
+		command.Stdout = DefaultStdoutStderr
+		command.Stderr = DefaultStdoutStderr
+		if err := command.Run(); err != nil {
+			return err
+		}
 	}
 
-	command := exec.Command("cf", "start", a.Name)
+	if a.logCmd == nil {
+		a.logCmd = exec.Command("cf", "logs", a.Name)
+		a.logCmd.Stderr = DefaultStdoutStderr
+		a.Stdout = &Buffer{}
+		a.logCmd.Stdout = a.Stdout
+		if err := a.logCmd.Start(); err != nil {
+			return err
+		}
+	}
+
+	args := []string{"v3-push", a.Name, "-p", a.Path}
+	command := exec.Command("cf", args...)
 	command.Stdout = DefaultStdoutStderr
 	command.Stderr = DefaultStdoutStderr
 	if err := command.Run(); err != nil {
 		return err
 	}
+
 	return nil
 }
 

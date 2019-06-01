@@ -10,7 +10,8 @@ required = ["github.com/google/subcommands"]
 [[constraint]]
 name = "github.com/cloudfoundry/libbuildpack"
 # branch = "master"
-branch = "sidecar-dev"
+# branch = "sidecar-dev"
+branch = "v3dev"
 source = "github.com/drnic/libbuildpack"
 
 [[override]]

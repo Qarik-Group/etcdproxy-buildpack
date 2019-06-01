@@ -80,6 +80,8 @@ func PushAppAndConfirm(app *cutlass.App) {
 }
 
 func V3PushAppAndConfirm(app *cutlass.App) {
+	Expect(app.V3CreateApp()).To(Succeed())
+	Expect(app.V3ApplyManifest()).To(Succeed())
 	Expect(app.V3Push()).To(Succeed())
 	Eventually(func() ([]string, error) { return app.InstanceStates() }, 20*time.Second).Should(Equal([]string{"RUNNING"}))
 	Expect(app.ConfirmBuildpack(buildpackVersion)).To(Succeed())
