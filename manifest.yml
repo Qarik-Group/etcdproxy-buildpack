@@ -2,13 +2,13 @@
 language: etcdproxy
 default_versions:
 - name: etcd
-  version: 3.3.14
+  version: 3.3.15
 dependency_deprecation_dates: []
 dependencies:
 - name: etcd
-  version: 3.3.14
-  uri: https://github.com/etcd-io/etcd/releases/download/v3.3.14/etcd-v3.3.14-linux-amd64.tar.gz
-  sha256: 0411d9cf186a44def2fff88a9f4c7dad82c3dbd716e1f839fd5cbc94fcada388
+  version: 3.3.15
+  uri: https://github.com/etcd-io/etcd/releases/download/v3.3.15/etcd-v3.3.15-linux-amd64.tar.gz
+  sha256: 87e30dc472a48b775a9e764cb742a5df0a2844e7b82d12917d7ea489febbc8c8
   cf_stacks:
   - cflinuxfs2
   - cflinuxfs3
