@@ -1,7 +1,9 @@
 package supply
 
 import (
+	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -75,6 +77,18 @@ func (s *Supplier) Run() error {
 
 	// Rename and move into bin/etcdctl, which will be in $PATH
 	err = os.Rename(etcdctlFile[0], filepath.Join(s.Stager.DepDir(), "bin", "etcdctl"))
+	if err != nil {
+		return err
+	}
+
+	// Create launch.yml to start sidecar
+	launchYml := fmt.Sprintf(`processes:
+  - type: "etcd"
+    command: "etcd grpc-proxy start --endpoints=${ETCD_ENDPOINTS:?required} --listen-addr=127.0.0.1:2379"
+    platforms:
+      cloudfoundry:
+        sidecar_for: [ "web" ]`)
+	err = ioutil.WriteFile(filepath.Join(s.Stager.DepDir(), "launch.yml"), []byte(launchYml), 0644)
 	if err != nil {
 		return err
 	}
