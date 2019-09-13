@@ -20,17 +20,16 @@ You configure your Cloud Foundry application to both:
 There is a sample application within `fixtures/rubyapp` that can be installed. To use sidecars we need the `cf v3-xyz` commands:
 
 ```plain
-cf create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
-cf v3-create-app app-using-etcd
-cf v3-apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
-cf v3-push app-using-etcd -p fixtures/rubyapp
+cf7 create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
+cf7 create-app app-using-etcd
+cf7 apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
+cf7 push app-using-etcd -p fixtures/rubyapp
 ```
 
-During deployment staging of `cf v3-push` you will see the latest etcd version being installed into the application droplet:
-
+During deployment staging of `cf7 push` you will see the latest etcd version being installed into the application droplet:
 
 ```plain
-$ cf v3-push
+$ cf7 push
 ...
 [STG/0] OUT -----> Etcdproxy Buildpack version 1.0.0
 [STG/0] OUT -----> Supplying etcd
@@ -42,7 +41,7 @@ $ cf v3-push
 The application container logs will show etcd proxy output with `ETCDPROXY/0` prefix:
 
 ```plain
-$ cf logs app-with-etcd
+$ cf7 logs app-with-etcd
 ...
 [APP/PROC/WEB/SIDECAR/ETCDPROXY/0] ERR | etcdmain: listening for grpc-proxy client requests on 127.0.0.1:2379
 ```
@@ -80,10 +79,10 @@ To build this buildpack, run the following command from the buildpack's director
     Upload the buildpack to your Cloud Foundry.
 
     ```bash
-    cf create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
-    cf v3-create-app app-using-etcd
-    cf v3-apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
-    cf v3-push app-using-etcd -p fixtures/rubyapp
+    cf7 create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
+    cf7 create-app app-using-etcd
+    cf7 apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
+    cf7 push app-using-etcd -p fixtures/rubyapp
     ```
 
     As buildpack that delivers a sidecar, you'll need an explicit `manifest.yml` that describes the startup of the sidecar. For example, running an app within CFDev, and proxying to an etcd server on your host machine (`host.cfdev.sh:2379`):
