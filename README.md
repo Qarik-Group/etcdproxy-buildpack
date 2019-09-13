@@ -23,7 +23,7 @@ There is a sample application within `fixtures/rubyapp` that can be installed. T
 cf7 create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
 cf7 create-app app-using-etcd
 cf7 apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
-cf7 push app-using-etcd -p fixtures/rubyapp
+cf7 push app-using-etcd -p $PWD/fixtures/rubyapp -f $PWD/fixtures/rubyapp/manifest.cfdev.yml
 ```
 
 During deployment staging of `cf7 push` you will see the latest etcd version being installed into the application droplet:
@@ -82,7 +82,7 @@ To build this buildpack, run the following command from the buildpack's director
     cf7 create-buildpack etcdproxy_buildpack etcdproxy_buildpack-*.zip 1
     cf7 create-app app-using-etcd
     cf7 apply-manifest -f fixtures/rubyapp/manifest.cfdev.yml
-    cf7 push app-using-etcd -p fixtures/rubyapp
+    cf7 push app-using-etcd -p $PWD/fixtures/rubyapp -f $PWD/fixtures/rubyapp/manifest.cfdev.yml
     ```
 
     As buildpack that delivers a sidecar, you'll need an explicit `manifest.yml` that describes the startup of the sidecar. For example, running an app within CFDev, and proxying to an etcd server on your host machine (`host.cfdev.sh:2379`):
